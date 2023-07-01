@@ -5,16 +5,19 @@ Try to make stable Algorithm for react-refactor-tool for VsCode
 
 ## GitFlow
 
-- main with tags
+- main *with tags*
 - hotfix
 - realease 
 - dev
 - feat
+---
 
 - dev -> feat
 - dev -> release
 - realease -> main
 - main -> hotfix
+
+---
 
 if hotfix or feat, merge into main or dev, release
 
@@ -37,7 +40,7 @@ git tag -a 1.0
 
 ```bash
 npm install -g yarn
-
+# ========== jscodeshift for ts ==========
 yarn add jscodeshift
 yarn add @types/jscodeshift 
 ```
