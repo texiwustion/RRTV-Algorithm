@@ -31,3 +31,13 @@ git tag -a 1.0
 
 1. 组件提取：框选一定范围的代码，识别出最大可能范围的组件并提取为新**函数式组件**
 
+# Appendix
+
+## Dependencies
+
+```bash
+npm install -g yarn
+
+yarn add jscodeshift
+yarn add @types/jscodeshift 
+```
