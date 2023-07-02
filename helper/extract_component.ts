@@ -63,14 +63,19 @@ class Checker {
         // if (node?.start <= range.start && range.end <= node?.end) {
         //  node 上无 start 属性
         // }
-        const pathStart = path.get('start')
-        const pathEnd = path.get('end')
+        const pathStart = path.get('start').value
+        const pathEnd = path.get('end').value
+        // \\ Fix: need visit value
         if (!pathStart || !pathEnd) {
             return { check: false }
         }
-        if (pathStart <= range.start && range.end <= pathEnd) {
+        /**
+         * range.start | PathStart | pathEnd | range.end
+         */
+        if (range.start <= pathStart && pathEnd <= range.end) {
             return { check: true }
         }
+        // \\ Fix: 包裹关系
         return { check: false }
     }
 }
@@ -79,17 +84,18 @@ const filterMethod = {
     range: {
         bestJSXElement: (jsxElements: j.Collection): j.ASTPath | boolean => {
             let best: j.ASTPath | undefined = undefined
-            let range = globalThis.range
+            let bestRange = range
+            // \\ Fix: 用不同名，方便访问全局变量
             jsxElements.forEach((path: j.ASTPath) => {
-                if (new Checker().range(path, range)) {
+                if (new Checker().range(path, bestRange)) {
                     best = path
-                    range = {
-                        start: path.get('start'),
-                        end: path.get('end')
+                    bestRange = {
+                        start: path.get('start').value,
+                        end: path.get('end').value
                     }
                 }
             })
-            if (!best)
+            if (best === undefined)
                 return false
             return best
         }
