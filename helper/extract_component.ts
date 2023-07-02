@@ -16,8 +16,9 @@ const text = `const App = () => {
 
 /**
  * the range of selection, present by offset
+ * HERE: exactly a whole <div> in text
  */
-const range = { start: 3, end: 19 }
+const range = { start: 56, end: 159 }
 
 export default function transformer(file: j.FileInfo, api: j.API) {
     const j: j.JSCodeshift = api.jscodeshift;
@@ -38,4 +39,33 @@ export default function transformer(file: j.FileInfo, api: j.API) {
         console.log('line:32 variableDeclaration::: ', variableDeclaration);
     }
     return root.toSource();
+}
+
+interface checkProps {
+    check: boolean;
+    cache?: any;
+}
+
+class Checker {
+    get(path: j.ASTPath, attr: string): checkProps {
+        const res: any = path.get(attr)
+        if (!res) {
+            return { check: false }
+        }
+        return { check: true, cache: res}
+    }
+    range(path: j.ASTPath): checkProps {
+        // if (node?.start <= range.start && range.end <= node?.end) {
+            //  node 上无 start 属性
+        // }
+        const pathStart = path.get('start')
+        const pathEnd = path.get('end')
+        if (!pathStart || !pathEnd) {
+            return { check: false }
+        }
+        if (pathStart <= range.start && range.end <= pathEnd) {
+            return { check: true }
+        }
+        return { check: false }
+    }
 }
