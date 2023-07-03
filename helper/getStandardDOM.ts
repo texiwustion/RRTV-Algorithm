@@ -8,7 +8,7 @@ export const getStandardDOM = {
 
         if (openingMatches === null || closingMatches === null) {
             console.log("这段文本内无完整 DOM 元素！")
-            return
+            return null
         }
 
         const firstOpeningMatch = openingMatches[0]
@@ -17,16 +17,9 @@ export const getStandardDOM = {
         const endIndex: number = text.lastIndexOf(lastClosingMatch) + lastClosingMatch.length
 
         const rawText = text.slice(startIndex, endIndex)
-        console.log('line:20 rawText::: ', rawText);
         const newText = "<>\n" + rawText + "\n</>"
-        console.log('line:22 newText::: ', newText);
+
+        return { rawText, newText }
     }
 }
 
-const text = `=> <button> eiarsnt</button> 
-<div>
-    <p></p>
-    <button> </button>
-</div`
-
-getStandardDOM.byText(text)
