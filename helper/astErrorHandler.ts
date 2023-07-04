@@ -6,8 +6,9 @@ import * as j from 'jscodeshift'
  * @param text String, a range of text from USER selection
  * @returns null | root: j.Collection (a complete jsxElement)
  */
-export function astHandle(text: string): j.Collection<any> | null {
+export function astHandle(text: string): any | null {
     const result = getStandardDOM.byText(text)
+    let useText: string = "rawText"
     if (result === null) {
         return null
     }
@@ -18,6 +19,7 @@ export function astHandle(text: string): j.Collection<any> | null {
     catch (e) {
         try {
             root = j(result.newText)
+            useText = "newText"
         }
         catch (e) {
             console.log("[astErrorHandler]Line24::: Error: 所选区域内 DOM 元素不完整！")
@@ -29,6 +31,6 @@ export function astHandle(text: string): j.Collection<any> | null {
         return null
     }
     else {
-        return root
+        return { root, ...result, useText }
     }
 }
