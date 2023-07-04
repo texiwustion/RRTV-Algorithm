@@ -20,7 +20,7 @@ export function astHandle(text: string): j.Collection<any> | null {
             root = j(result.newText)
         }
         catch (e) {
-            console.log("[astErrorHandler]Line24::: Error: 所选区域内无完整 DOM 元素！")
+            console.log("[astErrorHandler]Line24::: Error: 所选区域内 DOM 元素不完整！")
         }
     }
 
