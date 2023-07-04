@@ -19,7 +19,10 @@ export const getStandardDOM = {
         const rawText = text.slice(startIndex, endIndex)
         const newText = "<>\n" + rawText + "\n</>"
 
-        return { rawText, newText }
+        return { rawText, newText, deltaRange: {
+            start: startIndex,
+            end: endIndex
+        } }
     }
 }
 
