@@ -3,6 +3,9 @@ import * as j from 'jscodeshift'
 
 export const extractComponent = {
     jsxElement: null,
+    rawText: null,
+    newText: null,
+    deltaRange: null,
     /**
      * check this text if is valid
      * @param text String, from USER selection
@@ -15,7 +18,10 @@ export const extractComponent = {
             return false
         }
         else {
-            this.jsxElement = result
+            this.jsxElement = result.root
+            this.rawText = result.rawText
+            this.newText = result.newText
+            this.deltaRange = result.deltaRange
             return true
         }
     },
@@ -25,5 +31,17 @@ export const extractComponent = {
         }
 
         const root = j(document)
+    }
+}
+
+export interface Range {
+    start: number;
+    end: number;
+}
+
+export function getNewRange(range: Range, deltaRange: Range) {
+    return {
+        start: range.start + deltaRange.start,
+        end: range.start + deltaRange.end
     }
 }
