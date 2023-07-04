@@ -21,6 +21,7 @@ export function astHandle(text: string): j.Collection<any> | null {
         }
         catch (e) {
             console.log("[astErrorHandler]Line24::: Error: 所选区域内 DOM 元素不完整！")
+            /* <hello><button id="1" me="2"></button>*/
         }
     }
 
