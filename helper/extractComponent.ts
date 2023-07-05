@@ -6,6 +6,7 @@ export const extractComponent = {
     rawText: null,
     newText: null,
     deltaRange: null,
+    useText: null,
     /**
      * check this text if is valid
      * @param text String, from USER selection
@@ -22,6 +23,7 @@ export const extractComponent = {
             this.rawText = result.rawText
             this.newText = result.newText
             this.deltaRange = result.deltaRange
+            this.useText = result.useText
             return true
         }
     },
@@ -31,6 +33,7 @@ export const extractComponent = {
         }
 
         const root = j(document)
+        return root.findJSXElements('button').map(path=>path.get("end"))
     }
 }
 
@@ -40,8 +43,16 @@ export interface Range {
 }
 
 export function getNewRange(range: Range, deltaRange: Range) {
+    if (deltaRange === null) 
+        return null
     return {
         start: range.start + deltaRange.start,
         end: range.start + deltaRange.end
+    }
+}
+
+export const getAstNode = {
+    byRange(range: Range, root: j.Collection) {
+        root.find(j.JSXElement)
     }
 }
