@@ -14,7 +14,7 @@ export const getStandardDOM = {
         const firstOpeningMatch = openingMatches[0]
         const lastClosingMatch = closingMatches[closingMatches.length - 1]
         const startIndex: number = text.indexOf(firstOpeningMatch) - 1
-        const endIndex: number = text.lastIndexOf(lastClosingMatch) + lastClosingMatch.length
+        const endIndex: number = text.lastIndexOf(lastClosingMatch) + lastClosingMatch.length - 1
 
         const rawText = text.slice(startIndex, endIndex)
         const newText = "<>\n" + rawText + "\n</>"
