@@ -1,12 +1,23 @@
 import { astHandle } from './astErrorHandler';
 import * as j from 'jscodeshift'
 
-export const extractComponent = {
+interface extractComponentProps {
+    jsxElement: null | j.JSXElement;
+    rawText: null | string;
+    newText: null | string;
+    deltaRange: null | Range;
+    useText: null | string;
+    newFunction: null | j.FunctionDeclaration
+    check(text: string): boolean;
+    modify(document: string): string;
+}
+export const extractComponent: extractComponentProps = {
     jsxElement: null,
     rawText: null,
     newText: null,
     deltaRange: null,
     useText: null,
+    newFunction: null,
     /**
      * check this text if is valid
      * @param text String, from USER selection
@@ -32,8 +43,27 @@ export const extractComponent = {
             throw new Error("[extractComponent] Line 22 ::: 在 modify 前未执行 check!")
         }
 
-        const root = j(document)
-        return root.findJSXElements('button').map(path=>path.get("end"))
+        const fragment = j.jsxFragment(j.jsxOpeningFragment(), j.jsxClosingFragment())
+        let newReturnBody
+        if (this.useText === 'newText')
+            newReturnBody = j(this.newText).find(j.JSXFragment).paths()[0].node
+        else
+            newReturnBody = j(this.rawText).find(j.JSXElement).paths()[0].node
+        this.newFunction = j.functionDeclaration(
+            j.identifier("NewFunction"),
+            [],
+            j.blockStatement([
+                j.returnStatement(newReturnBody)
+            ])
+        )
+        if (this.newFunction === null) {
+            throw new Error("[extractComponent] Line 37 ::: 组件提取失败！")
+        }
+
+        const root: j.Collection = j(document)
+        const insertPath: j.ASTPath = root.findJSXElements('NewFunction').closestScope().paths()[0].parent.parent
+        insertPath.insertBefore(this.newFunction)
+        return root.toSource()
     }
 }
 
@@ -43,7 +73,7 @@ export interface Range {
 }
 
 export function getNewRange(range: Range, deltaRange: Range) {
-    if (deltaRange === null) 
+    if (deltaRange === null)
         return null
     return {
         start: range.start + deltaRange.start,
