@@ -40,7 +40,8 @@ export const extractComponent: extractComponentProps = {
     },
     modify(document: string) {
         if (this.jsxElement === null) {
-            throw new Error("[extractComponent] Line 22 ::: 在 modify 前未执行 check!")
+            print("[extractComponent] Line 22 ::: 在 modify 前未执行 check!")
+            return "error"
         }
 
         const fragment = j.jsxFragment(j.jsxOpeningFragment(), j.jsxClosingFragment())
@@ -85,4 +86,33 @@ export const getAstNode = {
     byRange(range: Range, root: j.Collection) {
         root.find(j.JSXElement)
     }
+}
+
+const print = (str: string) => {
+    console.log(str)
+}
+
+export const extractSingleComponent = (code: string, range: Range) => {
+    const selection = code.slice(range.start, range.end)
+    const check: boolean = extractComponent.check(selection)
+    if (!check) {
+        print("[extractComponent] check is false")
+        return { check: false }
+    }
+    const deltaRange: Range = extractComponent?.deltaRange!
+    const newRange = getNewRange(range, deltaRange)
+    if (newRange === null) {
+        print("[extractComponent] failed in caculate newRange")
+        return { check: false }
+    }
+    const jsxSnippet = new Array(
+        code.substring(0, newRange.start - 1),
+        "\t\t<NewFunction />",
+        /// TODO: 随机字符串生成 + snippet，方便程序和snippet 定位
+        code.substring(newRange.end + 1)
+    ).join("")
+    const res = extractComponent.modify(jsxSnippet!)
+    return { check: true, data: {
+        newText: res
+    }}
 }
