@@ -360,3 +360,15 @@ function NewFunction({ id, me, you, type }) {
     );
 }
 `
+const range_54_184 = {
+    "start": 54,
+    "end": 184
+}
+const range_54_164 = {
+    "start": 54,
+    "end": 164
+}
+const range_54_71 = {
+    "start": 54,
+    "end": 71
+}
