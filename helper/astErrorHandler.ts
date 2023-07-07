@@ -8,7 +8,6 @@ import * as j from 'jscodeshift'
  */
 export function astHandle(text: string): any | null {
     const result = getStandardDOM.byText(text)
-    console.log('line:11 result::: ', result);
     let useText: string = "rawText"
     if (result === null) {
         return null

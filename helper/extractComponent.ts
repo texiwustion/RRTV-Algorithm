@@ -40,7 +40,7 @@ export const extractComponent: extractComponentProps = {
     },
     modify(document: string) {
         if (this.jsxElement === null) {
-            print("[extractComponent] Line 22 ::: 在 modify 前未执行 check!")
+            println("[extractComponent] Line 22 ::: 在 modify 前未执行 check!")
             return "error"
         }
 
@@ -88,7 +88,7 @@ export const getAstNode = {
     }
 }
 
-const print = (str: string) => {
+export const println = (str: string) => {
     console.log(str)
 }
 
@@ -96,13 +96,13 @@ export const extractSingleComponent = (code: string, range: Range) => {
     const selection = code.slice(range.start, range.end)
     const check: boolean = extractComponent.check(selection)
     if (!check) {
-        print("[extractComponent] check is false")
+        println("[extractComponent] check is false")
         return { check: false }
     }
     const deltaRange: Range = extractComponent?.deltaRange!
     const newRange = getNewRange(range, deltaRange)
     if (newRange === null) {
-        print("[extractComponent] failed in caculate newRange")
+        println("[extractComponent] failed in caculate newRange")
         return { check: false }
     }
     const jsxSnippet = new Array(
