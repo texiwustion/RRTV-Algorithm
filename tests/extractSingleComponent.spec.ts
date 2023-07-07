@@ -1,80 +1,34 @@
-import { extractComponent, Range, getNewRange } from "../helper/extractComponent"
+import { extractSingleComponent } from "../helper/extractComponent"
 
-const code = `const TestSim = () => {
-    return <>
-        <hello>
-            <button id="1" me="2"></button>
-            <button you="3" type="4"></button>
-        </hello>
-        <div>
-            <button id="1" me="2"></button>
-            <button you="3" type="4"></button>
-        </div>
-        <p></p>
-    </> 
-    }
-    const TestSim2 = () => {
-    return <>
-        <code></code>
-        <div>
-            <button id="1" me="2"></button>
-            <button you="3" type="4"></button>
-        </div>
-        <hello>
-            <button id="1" me="2"></button>
-            <button you="3" type="4"></button>
-        </hello>
-    </> 
-    }
+import { code, range, random_range } from "./__fixtures__/extractSingleComponent.input"
 
-    function NewFunction({id, me, you, type}) {
-    return <>
-        <div>
-            <button id={id} me={me}></button>
-            <button you={you} type={type}></button>
-        </div>
-    </>
-    }`
+import { prettierCode } from "../helper/prettier"
 
-const range = {
-    start: 54,
-    end: 99
-}
+import * as fs from "node:fs"
+import * as path from "node:path"
 
-const println = (str: string) => {
-    console.log(str)
-}
-const extractSingleComponent = (code: string, range: Range) => {
-    const selection = code.slice(range.start, range.end)
-    const check: boolean = extractComponent.check(selection)
-    if (!check) {
-        println("[extractComponent] check is false")
-        return { check: false }
-    }
-    const deltaRange: Range = extractComponent?.deltaRange!
-    const newRange = getNewRange(range, deltaRange)
-    if (newRange === null) {
-        println("[extractComponent] failed in caculate newRange")
-        return { check: false }
-    }
-    const jsxSnippet = new Array(
-        code.substring(0, newRange.start - 1),
-        "\t\t<NewFunction />",
-        /// TODO: 随机字符串生成 + snippet，方便程序和snippet 定位
-        code.substring(newRange.end + 1)
-    ).join("")
-    const res = extractComponent.modify(jsxSnippet!)
-    return {
-        check: true, data: {
-            newText: res
-        }
-    }
-}
-const result = extractSingleComponent(code, range)
+it("extract single component --success", async () => {
+    const result = extractSingleComponent(code.success, range.success)
+    await expect(result).toMatchFileSnapshot("./__fixtures__/extractSingleComponent-success.output")
+})
 
-if (result?.data)
+it("extract single component --faild", async () => {
+    const result = extractSingleComponent(code.success, range.failed)
+    await expect(result).toMatchFileSnapshot("./__fixtures__/extractSingleComponent-failed.output")
+})
 
-    it("extract single component", async () => {
-        const { newText } = result.data
-        await expect(newText).toMatchFileSnapshot("./__fixtures__/extractSingleComponent.output.jsx")
+it("extract single component --random-range", async () => {
+    const content = `\nconst range_${random_range.start}_${random_range.end} = ${JSON.stringify(random_range, null, 4)}`
+    const result = extractSingleComponent(code.success, random_range)
+    await fs.appendFile(path.join(__dirname, '__fixtures__/extractSingleComponent.random.ts'), content, 'utf-8', (err) => {
+        console.log(content)
     })
+    if (result.check === true) {
+        const newText = `\nconst text_${random_range.start}_${random_range.end} = \`${await prettierCode(result.data.newText)}\``
+        await fs.appendFile(path.join(__dirname, '__fixtures__/extractSingleComponent.random.ts'), newText, 'utf-8', ()=>{})
+    }
+    await expect(result).toMatchFileSnapshot("./__fixtures__/extractSingleComponent-random.output")
+})
+
+
+
